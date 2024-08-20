@@ -1,10 +1,60 @@
 pipeline {
-  agent any
-  stages {
-    stage('hello') {
-      steps {
-        sh 'echo "Hello World"'
-      }
+    agent any
+
+    environment {
+        NODE_VERSION = '22.6.0' // Specify the Node.js version you are using
     }
-  }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Checkout the code from the specified Git repository
+                git url: 'https://github.com/akash006singh/jenkins.git'
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                // Install dependencies using the already installed Node.js
+                sh 'npm install'
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                // Run tests (assuming you have a test script in package.json)
+                sh 'npm test'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                // Optionally, add a build step if you have a build script
+                sh 'npm run build'
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                // Add your deployment steps here if needed
+                echo 'Deploying application...'
+                // Example deployment command (customize as needed)
+                // sh './deploy.sh'
+            }
+        }
+    }
+
+    post {
+        always {
+            // Cleanup and notifications (e.g., email, Slack) can be added here
+            echo 'Cleaning up...'
+            cleanWs()
+        }
+        success {
+            echo 'Build succeeded!'
+        }
+        failure {
+            echo 'Build failed!'
+        }
+    }
 }
